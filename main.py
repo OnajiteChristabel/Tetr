@@ -93,6 +93,31 @@ class Application(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.tetris = Tetris()
+        self.pack(fill=tk.BOTH, expand=True)
+        self.create_widgets()
+        
+    def create_widgets(self):
+        self.title_msg = tk.Label(self, text="Tetri", font=("TimesNewRoman", 70), fg="black", bg="darkgrey")
+        self.title_msg.pack(side="top", pady=50)
+        self.play_button = tk.Button(self, text="Play", font=("TimesNewRoman", 20), command=self.start_game)
+        self.play_button.pack(side="top", pady=50)
+    
+    
+
+        self.configure(bg="darkgrey")
+        
+    def start_game(self):
+        self.master.withdraw()
+        game_window = tk.Toplevel()
+        game_window.title("Tetri")
+        game_window.resizable(20, 20)
+        app = GameApplication(master=game_window) 
+              
+
+class GameApplication(tk.Frame):
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.tetris = Tetris()
         self.pack()
         self.create_widgets()
         self.update_clock()
@@ -103,7 +128,7 @@ class Application(tk.Frame):
         self.master.after(int(1000*(0.66**self.tetris.level)), self.update_clock)
     
     def create_widgets(self):
-        PIECE_SIZE = 30
+        PIECE_SIZE = 40
         self.canvas = tk.Canvas(self, height=PIECE_SIZE*self.tetris.FIELD_HEIGHT, 
                                       width = PIECE_SIZE*self.tetris.FIELD_WIDTH, bg="black", bd=0)
         self.canvas.bind('<Left>', lambda _: (self.tetris.move(0, -1), self.update()))
@@ -112,15 +137,29 @@ class Application(tk.Frame):
         self.canvas.bind('<Up>', lambda _: (self.tetris.rotate(), self.update()))
         self.canvas.focus_set()
         self.rectangles = [
-            self.canvas.create_rectangle(c*PIECE_SIZE, r*PIECE_SIZE, (c+1)*PIECE_SIZE, (r+1)*PIECE_SIZE)
+            self.canvas.create_rectangle(c*PIECE_SIZE, r*PIECE_SIZE, (c+1)*PIECE_SIZE, (r+1)*PIECE_SIZE, outline="", fill="")
                 for r in range(self.tetris.FIELD_HEIGHT) for c in range(self.tetris.FIELD_WIDTH)
         ]
         self.canvas.pack(side="left")
+        self.next_tetromino_frame = tk.Frame(self, width=PIECE_SIZE * 2, height=PIECE_SIZE * 2, bg="grey")
+        self.next_tetromino_frame.pack(side="right", padx=10, pady=(self.tetris.FIELD_HEIGHT * PIECE_SIZE - PIECE_SIZE * 2) // 2, anchor="center")
+        self.next_tetromino_label = tk.Label(
+            self.next_tetromino_frame, text="Next Tetromino", font=("TimesNewRoman", 14), fg="black", bg="grey"
+    )
+        self.next_tetromino_label.pack(side="top", pady=5)
+
+        self.next_tetromino_canvas = tk.Canvas(
+         self.next_tetromino_frame, height=PIECE_SIZE * 4, width=PIECE_SIZE * 4, bg="grey", bd=0
+    )
+    
+        self.next_tetromino_canvas.pack(side="top")
+        self.title_msg = tk.Label(self, text="Tetris", font=("TimesNewRoman", 40), fg="black", bg="grey")
+        self.title_msg.pack(side="top", pady=10)
         self.status_msg = tk.Label(self, anchor='w', width=11, font=("Courier", 24))
         self.status_msg.pack(side="top")
         self.game_over_msg = tk.Label(self, anchor='w', width=11, font=("Courier", 24), fg='red')
         self.game_over_msg.pack(side="top")
-    
+        
     def update(self):
         for i, _id in enumerate(self.rectangles):
             color_num = self.tetris.get_color(i//self.tetris.FIELD_WIDTH, i % self.tetris.FIELD_WIDTH)
@@ -129,6 +168,9 @@ class Application(tk.Frame):
         self.status_msg['text'] = "Score: {}\nLevel: {}".format(self.tetris.score, self.tetris.level)
         self.game_over_msg['text'] = "GAME OVER.\nPress UP\nto reset" if self.tetris.game_over else ""
 
+        
+
 root = tk.Tk()
 app = Application(master=root)
 app.mainloop()
+root.mainloop()
