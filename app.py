@@ -9,11 +9,11 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('game.html')
 
 @app.route('/game')
 def game():
-    pass
+    return render_template('game.html') 
 
 def play_song():
     mixer.init()
