@@ -1,7 +1,16 @@
 import tkinter as tk
 import random
 from threading import Lock
+from pygame import mixer
+from PIL import Image, ImageTk
 
+def play_song():
+    mixer.init()
+    mixer.music.load("song.mp3")
+    mixer.music.play()
+
+def stop_song():
+    mixer.music.stop()
 COLORS = ['gray', 'white', 'red', 'blue', 'orange', 'purple']
 
 class Tetris():
@@ -97,22 +106,25 @@ class Application(tk.Frame):
         self.create_widgets()
         
     def create_widgets(self):
-        self.title_msg = tk.Label(self, text="Tetri", font=("TimesNewRoman", 70), fg="black", bg="darkgrey")
-        self.title_msg.pack(side="top", pady=50)
-        self.play_button = tk.Button(self, text="Play", font=("TimesNewRoman", 20), command=self.start_game)
-        self.play_button.pack(side="top", pady=50)
-    
-    
+        image = Image.open("static/img2.jpeg")
+        image = image.resize((self.master.winfo_screenwidth(), self.master.winfo_screenheight()))
+        photo = ImageTk.PhotoImage(image)
 
-        self.configure(bg="darkgrey")
+        image_label = tk.Label(self, image=photo)
+        image_label.image = photo  
+        image_label.place(x=0, y=0, relwidth=1, relheight=1)
+        
+
+        self.play_button = tk.Button(self, text="Play", font=("TimesNewRoman", 40), command=self.start_game)
+        self.play_button.place(relx=0.5, rely=0.7, anchor=tk.CENTER)
         
     def start_game(self):
         self.master.withdraw()
         game_window = tk.Toplevel()
-        game_window.title("Tetri")
+        game_window.title("Tetris")
         game_window.resizable(20, 20)
         app = GameApplication(master=game_window) 
-              
+        play_song()      
 
 class GameApplication(tk.Frame):
     def __init__(self, master=None):
@@ -124,11 +136,14 @@ class GameApplication(tk.Frame):
 
     def update_clock(self):
         self.tetris.move(1, 0)
-        self.update()  
-        self.master.after(int(1000*(0.66**self.tetris.level)), self.update_clock)
+        self.update()
+        if self.tetris.game_over:
+            stop_song()
+        else:    
+            self.master.after(int(1000*(0.8**self.tetris.level)), self.update_clock)
     
     def create_widgets(self):
-        PIECE_SIZE = 40
+        PIECE_SIZE = 30
         self.canvas = tk.Canvas(self, height=PIECE_SIZE*self.tetris.FIELD_HEIGHT, 
                                       width = PIECE_SIZE*self.tetris.FIELD_WIDTH, bg="black", bd=0)
         self.canvas.bind('<Left>', lambda _: (self.tetris.move(0, -1), self.update()))
