@@ -141,18 +141,7 @@ class GameApplication(tk.Frame):
                 for r in range(self.tetris.FIELD_HEIGHT) for c in range(self.tetris.FIELD_WIDTH)
         ]
         self.canvas.pack(side="left")
-        self.next_tetromino_frame = tk.Frame(self, width=PIECE_SIZE * 2, height=PIECE_SIZE * 2, bg="grey")
-        self.next_tetromino_frame.pack(side="right", padx=10, pady=(self.tetris.FIELD_HEIGHT * PIECE_SIZE - PIECE_SIZE * 2) // 2, anchor="center")
-        self.next_tetromino_label = tk.Label(
-            self.next_tetromino_frame, text="Next Tetromino", font=("TimesNewRoman", 14), fg="black", bg="grey"
-    )
-        self.next_tetromino_label.pack(side="top", pady=5)
-
-        self.next_tetromino_canvas = tk.Canvas(
-         self.next_tetromino_frame, height=PIECE_SIZE * 4, width=PIECE_SIZE * 4, bg="grey", bd=0
-    )
-    
-        self.next_tetromino_canvas.pack(side="top")
+        
         self.title_msg = tk.Label(self, text="Tetris", font=("TimesNewRoman", 40), fg="black", bg="grey")
         self.title_msg.pack(side="top", pady=10)
         self.status_msg = tk.Label(self, anchor='w', width=11, font=("Courier", 24))
